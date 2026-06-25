@@ -1,4 +1,4 @@
-const API_BASE = "/api/v1";
+const API_BASE = "https://expensetracker-five-sand.vercel.app/api/v1";
 
 const api = {
   getHeaders() {
@@ -7,7 +7,7 @@ const api = {
   async request(method, endpoint, body) {
     const response = await fetch(`${API_BASE}${endpoint}`, {
       method,
-      credentials: "same-origin",
+      credentials: "include",
       headers: this.getHeaders(),
       body: body ? JSON.stringify(body) : undefined
     });
