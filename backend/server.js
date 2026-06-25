@@ -10,7 +10,9 @@ const logger = require("./src/utils/logger");
 if (!env.jwtSecret || env.jwtSecret === "change_me" || env.jwtSecret.length < 20) {
   logger.error("JWT_SECRET is missing or too weak. Please set a strong secret in .env");
   console.error("JWT_SECRET validation failed. Update .env and restart.");
-  process.exit(1);
+  if (process.env.NODE_ENV !== "production") {
+    process.exit(1);
+  }
 }
 
 const db = require("./src/config/db");
@@ -23,6 +25,7 @@ const pageAuth = require("./src/middleware/pageAuth");
 
 const app = express();
 
+// Connect to database
 db.connectDB(env.mongoUri);
 
 app.use(
@@ -51,7 +54,8 @@ app.use(requestLogger);
 app.use(rateLimiter);
 
 // Static files - MUST be early
-app.use(express.static(path.join(__dirname, "../frontend/public"), { index: false }));
+const frontendPath = path.join(__dirname, "../frontend/public");
+app.use(express.static(frontendPath, { index: false }));
 
 app.use('/uploads/avatars', express.static(path.join(__dirname, 'uploads/avatars')));
 app.use('/uploads/receipts', express.static(path.join(__dirname, 'uploads/receipts')));
@@ -73,7 +77,7 @@ const privatePages = [
 ];
 
 app.get(privatePages, pageAuth, (req, res) => {
-  res.sendFile(path.join(__dirname, "../frontend/public", path.basename(req.path)));
+  res.sendFile(path.join(frontendPath, path.basename(req.path)));
 });
 
 app.use("/api/v1", routes);
@@ -81,17 +85,24 @@ app.use("/api/v1", routes);
 app.use(notFound);
 app.use(errorHandler);
 
-const server = app.listen(env.port, () => {
-  console.log(`ExpenseSplit running on http://localhost:${env.port}`);
-});
+// Export for Vercel (serverless)
+module.exports = app;
 
-const shutdown = async (signal) => {
-  logger.info(`${signal} received`);
-  server.close(async () => {
-    await db.disconnectDB();
-    process.exit(0);
+// For local development
+if (process.env.NODE_ENV !== "production") {
+  const PORT = env.port || 5000;
+  const server = app.listen(PORT, () => {
+    console.log(`ExpenseSplit running on http://localhost:${PORT}`);
   });
-};
 
-process.on("SIGINT", () => shutdown("SIGINT"));
-process.on("SIGTERM", () => shutdown("SIGTERM"));
+  const shutdown = async (signal) => {
+    logger.info(`${signal} received`);
+    server.close(async () => {
+      await db.disconnectDB();
+      process.exit(0);
+    });
+  };
+
+  process.on("SIGINT", () => shutdown("SIGINT"));
+  process.on("SIGTERM", () => shutdown("SIGTERM"));
+}
