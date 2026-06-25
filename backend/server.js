@@ -9,7 +9,6 @@ const logger = require("./src/utils/logger");
 
 if (!env.jwtSecret || env.jwtSecret === "change_me" || env.jwtSecret.length < 20) {
   logger.error("JWT_SECRET is missing or too weak. Please set a strong secret in .env");
-  console.error("JWT_SECRET validation failed. Update .env and restart.");
 }
 
 const db = require("./src/config/db");
@@ -32,17 +31,19 @@ const connectDatabase = async () => {
       logger.info("Database connected");
     } catch (error) {
       logger.error("Database connection failed:", error.message);
-      if (process.env.NODE_ENV !== "production") {
-        throw error;
-      }
     }
   }
 };
 
 // Middleware to ensure DB is connected
 app.use(async (req, res, next) => {
-  await connectDatabase();
-  next();
+  try {
+    await connectDatabase();
+    next();
+  } catch (error) {
+    logger.error("DB connection middleware error:", error);
+    next();
+  }
 });
 
 app.use(
@@ -58,7 +59,7 @@ app.use(
 
 app.use(
   cors({
-    origin: env.clientUrl,
+    origin: env.clientUrl || "*",
     credentials: true
   })
 );
@@ -70,33 +71,54 @@ app.use(morgan("dev"));
 app.use(requestLogger);
 app.use(rateLimiter);
 
-// Static files - MUST be early
-const frontendPath = path.join(__dirname, "../frontend/public");
-app.use(express.static(frontendPath, { index: false }));
-
-app.use('/uploads/avatars', express.static(path.join(__dirname, 'uploads/avatars')));
-app.use('/uploads/receipts', express.static(path.join(__dirname, 'uploads/receipts')));
-
-app.get("/", (req, res) => {
-  res.redirect("/dashboard.html");
+// Health check endpoint (no DB required)
+app.get("/api/v1/health", (req, res) => {
+  res.json({ success: true, message: "ExpenseSplit API is running", version: "1.0.0" });
 });
 
-app.get("/index.html", (req, res) => {
-  res.redirect("/dashboard.html");
-});
+// Try to serve frontend files (may not exist in serverless)
+try {
+  const frontendPath = path.join(__dirname, "../frontend/public");
+  app.use(express.static(frontendPath, { index: false }));
+} catch (error) {
+  logger.warn("Frontend path not found:", error.message);
+}
 
-const privatePages = [
-  "/dashboard.html",
-  "/expenses.html",
-  "/groups.html",
-  "/profile.html"
-];
+try {
+  app.use('/uploads/avatars', express.static(path.join(__dirname, 'uploads/avatars')));
+  app.use('/uploads/receipts', express.static(path.join(__dirname, 'uploads/receipts')));
+} catch (error) {
+  logger.warn("Uploads path not found:", error.message);
+}
 
-app.get(privatePages, pageAuth, (req, res) => {
-  res.sendFile(path.join(frontendPath, path.basename(req.path)));
-});
-
+// API routes (priority over static files)
 app.use("/api/v1", routes);
+
+// Frontend page routes
+try {
+  const frontendPath = path.join(__dirname, "../frontend/public");
+  
+  app.get("/", (req, res) => {
+    res.redirect("/dashboard.html");
+  });
+
+  app.get("/index.html", (req, res) => {
+    res.redirect("/dashboard.html");
+  });
+
+  const privatePages = [
+    "/dashboard.html",
+    "/expenses.html",
+    "/groups.html",
+    "/profile.html"
+  ];
+
+  app.get(privatePages, pageAuth, (req, res) => {
+    res.sendFile(path.join(frontendPath, path.basename(req.path)));
+  });
+} catch (error) {
+  logger.warn("Frontend routes not available:", error.message);
+}
 
 app.use(notFound);
 app.use(errorHandler);
