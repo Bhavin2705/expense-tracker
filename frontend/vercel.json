@@ -1,0 +1,15 @@
+{
+  "buildCommand": "echo 'Static site - no build needed'",
+  "outputDirectory": "public",
+  "framework": "static",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/$1"
+    },
+    {
+      "source": "/",
+      "destination": "/login.html"
+    }
+  ]
+}
