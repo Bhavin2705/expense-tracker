@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Groups — ExpenseSplit</title>
+  <link rel="stylesheet" href="/css/main.css" />
+  <link rel="stylesheet" href="/css/components.css" />
+  <link rel="stylesheet" href="/css/groups.css" />
+</head>
+
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+  <div id="toast-container" role="region" aria-label="Notifications" aria-live="polite"></div>
+
+  <!-- Create/Edit Group Modal -->
+  <div class="modal-backdrop hidden" id="groupModalBackdrop" role="dialog" aria-modal="true"
+    aria-labelledby="groupModalTitle">
+    <div class="modal">
+      <div class="modal-header">
+        <div>
+          <h2 class="modal-title" id="groupModalTitle">Create group</h2>
+          <p class="modal-subtitle" id="groupModalSubtitle">Set up a shared expense space</p>
+        </div>
+        <button class="modal-close" id="groupModalClose" type="button" aria-label="Close modal">×</button>
+      </div>
+      <div class="modal-body">
+        <form id="groupForm" novalidate>
+          <input type="hidden" id="groupId" />
+          <div class="form-group">
+            <label for="groupName">Group name <span class="required">*</span></label>
+            <input id="groupName" maxlength="100" placeholder="e.g. Goa trip" required />
+            <span class="field-error" id="groupNameError" aria-live="polite"></span>
+          </div>
+          <div class="form-group">
+            <label for="groupDescription">Description</label>
+            <textarea id="groupDescription" rows="3" maxlength="500" placeholder="What is this group for?"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="groupCurrency">Currency</label>
+            <select id="groupCurrency">
+              <option value="INR">INR — Indian Rupee</option>
+              <option value="USD">USD — US Dollar</option>
+              <option value="EUR">EUR — Euro</option>
+              <option value="GBP">GBP — British Pound</option>
+              <option value="AUD">AUD — Australian Dollar</option>
+              <option value="CAD">CAD — Canadian Dollar</option>
+            </select>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="groupCancelBtn" type="button">Cancel</button>
+        <button class="btn btn-primary" id="groupSaveBtn">Create group</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add/Edit Participant Modal -->
+  <div class="modal-backdrop hidden" id="participantModalBackdrop" role="dialog" aria-modal="true"
+    aria-labelledby="participantModalTitle">
+    <div class="modal">
+      <div class="modal-header">
+        <div>
+          <h2 class="modal-title" id="participantModalTitle">Add participant</h2>
+          <p class="modal-subtitle">Participants need an ExpenseSplit account</p>
+        </div>
+        <button class="modal-close" id="participantModalClose" type="button" aria-label="Close modal">×</button>
+      </div>
+      <div class="modal-body">
+        <form id="participantForm" novalidate>
+          <input type="hidden" id="participantId" />
+          <div class="form-row">
+            <div class="form-group">
+              <label for="participantName">Name <span class="required">*</span></label>
+              <input id="participantName" maxlength="100" required />
+            </div>
+            <div class="form-group">
+              <label for="participantEmail">Email</label>
+              <input id="participantEmail" type="email" autocomplete="email" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="participantNotes">Notes</label>
+            <textarea id="participantNotes" rows="3" maxlength="500" placeholder="Optional context"></textarea>
+          </div>
+          <label class="checkbox-row" id="participantActiveRow">
+            <input id="participantActive" type="checkbox" checked />
+            <span>Active participant</span>
+          </label>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="participantCancelBtn" type="button">Cancel</button>
+        <button class="btn btn-primary" id="participantSaveBtn">Add participant</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Link Account Modal -->
+  <div class="modal-backdrop hidden" id="linkModalBackdrop" role="dialog" aria-modal="true"
+    aria-labelledby="linkModalTitle">
+    <div class="modal modal-sm">
+      <div class="modal-header">
+        <div>
+          <h2 class="modal-title" id="linkModalTitle">Link an account</h2>
+          <p class="modal-subtitle">Use the email of an existing ExpenseSplit user</p>
+        </div>
+        <button class="modal-close" id="linkModalClose" type="button" aria-label="Close modal">×</button>
+      </div>
+      <div class="modal-body">
+        <form id="linkForm">
+          <input type="hidden" id="linkParticipantId" />
+          <div class="form-group">
+            <label for="linkEmail">Account email</label>
+            <input id="linkEmail" type="email" autocomplete="email" required />
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="linkCancelBtn" type="button">Cancel</button>
+        <button class="btn btn-primary" id="linkSaveBtn">Link account</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Split Expense Modal -->
+  <div class="modal-backdrop hidden" id="splitModalBackdrop" role="dialog" aria-modal="true"
+    aria-labelledby="splitModalTitle">
+    <div class="modal modal-lg">
+      <div class="modal-header">
+        <div>
+          <h2 class="modal-title" id="splitModalTitle">Add expense</h2>
+          <p class="modal-subtitle">Record and split a shared cost</p>
+        </div>
+        <button class="modal-close" id="splitModalClose" type="button" aria-label="Close modal">×</button>
+      </div>
+      <div class="modal-body">
+        <form id="splitForm" novalidate>
+          <div class="form-row">
+            <div class="form-group" style="flex:2">
+              <label for="splitTitle">Title <span class="required">*</span></label>
+              <input id="splitTitle" maxlength="200" placeholder="e.g. Dinner at hotel" required />
+            </div>
+            <div class="form-group">
+              <label for="splitAmount">Amount <span class="required">*</span></label>
+              <input id="splitAmount" type="number" min="0.01" step="0.01" placeholder="0.00" required />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="splitPaidBy">Paid by <span class="required">*</span></label>
+              <select id="splitPaidBy" required></select>
+            </div>
+            <div class="form-group">
+              <label for="splitDate">Date</label>
+              <input id="splitDate" type="date" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="splitCategory">Category</label>
+            <input id="splitCategory" maxlength="100" placeholder="e.g. Food, Transport" />
+          </div>
+          <div class="form-group">
+            <label for="splitType">Split method</label>
+            <select id="splitType">
+              <option value="equal">Split equally</option>
+              <option value="custom">Custom amounts</option>
+              <option value="percentage">By percentage</option>
+            </select>
+          </div>
+          <div id="splitParticipantsSection">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-2)">
+              <label style="margin:0;font-size:13px;font-weight:500">Participants in this expense</label>
+              <button class="btn btn-sm btn-ghost" type="button" id="splitSelectAllBtn">Select all</button>
+            </div>
+            <div id="splitParticipantRows"></div>
+          </div>
+          <div class="form-group" style="margin-top:var(--space-4)">
+            <label for="splitDescription">Notes</label>
+            <textarea id="splitDescription" rows="2" maxlength="500" placeholder="Optional details"></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="splitCancelBtn" type="button">Cancel</button>
+        <button class="btn btn-primary" id="splitSaveBtn">Add expense</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Expense Detail Modal -->
+  <div class="modal-backdrop hidden" id="expenseDetailModalBackdrop" role="dialog" aria-modal="true"
+    aria-labelledby="expenseDetailTitle">
+    <div class="modal modal-sm">
+      <div class="modal-header">
+        <div>
+          <h2 class="modal-title" id="expenseDetailTitle">Expense details</h2>
+          <p class="modal-subtitle" id="expenseDetailSubtitle"></p>
+        </div>
+        <button class="modal-close" id="expenseDetailClose" type="button" aria-label="Close modal">×</button>
+      </div>
+      <div class="modal-body" id="expenseDetailBody"></div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="expenseDetailDone" type="button">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar" aria-label="Main navigation">
+      <div class="sidebar-header">
+        <a class="brand" href="/" aria-label="ExpenseSplit home">
+          <div class="brand-icon" aria-hidden="true"></div>
+          <span class="brand-name">ExpenseSplit</span>
+        </a>
+      </div>
+      <nav class="sidebar-nav" aria-label="Primary">
+        <span class="nav-section-label">Workspace</span>
+        <a class="nav-item" href="/dashboard.html">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+          </svg>
+          Dashboard
+        </a>
+        <a class="nav-item" href="/expenses.html">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+            <path d="M14 2v6h6M16 13H8M16 17H8" />
+          </svg>
+          Expenses
+        </a>
+        <a class="nav-item active" href="/groups.html" aria-current="page">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+            <path d="M23 21v-2a4 4 0 00-3-3.87" />
+          </svg>
+          Groups
+        </a>
+        <!-- <a class="nav-item" href="/categories.html">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z" />
+          </svg>
+          Categories
+        </a> -->
+      </nav>
+      <div class="sidebar-footer">
+        <div class="sidebar-user" id="sidebarUser">
+          <div class="user-avatar" id="userAvatar">U</div>
+          <div class="user-info">
+            <div class="user-name" id="userName">Loading...</div>
+            <div class="user-role">Personal account</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <div class="page-wrapper">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="mobile-nav-btn" id="mobileNavBtn" aria-label="Toggle sidebar" aria-expanded="false">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 6h18M3 12h18M3 18h18" />
+            </svg>
+          </button>
+          <nav class="topbar-breadcrumb" aria-label="Breadcrumb">
+            <span>Workspace</span><span>/</span><strong>Groups</strong>
+          </nav>
+        </div>
+        <div class="topbar-right">
+          <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+            <svg id="themeIconSun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2">
+              <circle cx="12" cy="12" r="5" />
+              <path d="M12 1v2M12 21v2M1 12h2M21 12h2" />
+            </svg>
+            <svg id="themeIconMoon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" style="display:none">
+              <path d="M21 12.8A9 9 0 1111.2 3 7 7 0 0021 12.8z" />
+            </svg>
+          </button>
+          <button class="btn btn-sm btn-secondary" id="logoutBtn">Sign out</button>
+        </div>
+      </header>
+
+      <main class="page-content" id="main-content" tabindex="-1">
+        <header class="page-header">
+          <div>
+            <p class="page-eyebrow">Shared expenses</p>
+            <h1 class="page-title">Groups</h1>
+            <p class="page-subtitle">Organize trips, households, and events with people who may or may not have an
+              account.</p>
+          </div>
+          <button class="btn btn-primary" id="createGroupBtn">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+            New group
+          </button>
+        </header>
+
+        <div class="stats-grid groups-stats" id="groupStats"></div>
+
+        <div class="filters-bar groups-filters" role="search">
+          <div class="search-wrapper filter-grow">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8" />
+              <path d="M21 21l-4.35-4.35" />
+            </svg>
+            <input type="search" id="groupSearch" placeholder="Search groups..." aria-label="Search groups" />
+          </div>
+          <select id="archiveFilter" aria-label="Filter groups by status">
+            <option value="">All groups</option>
+            <option value="false">Active groups</option>
+            <option value="true">Archived groups</option>
+          </select>
+        </div>
+
+        <div id="groupsLoading" class="loading-state">
+          <div class="spinner spinner-lg"></div><span>Loading groups...</span>
+        </div>
+        <div id="groupsError" class="error-state hidden" role="alert"></div>
+
+        <div class="groups-layout" id="groupsLayout">
+          <section>
+            <div class="groups-grid" id="groupsContainer" role="list"></div>
+          </section>
+          <aside class="group-detail card" id="groupDetail" aria-live="polite"></aside>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="/js/auth.js"></script>
+  <script src="/js/services/groupService.js"></script>
+  <script src="/js/services/splitService.js"></script>
+  <script src="/js/pages/groups.js"></script>
+</body>
+
+</html>

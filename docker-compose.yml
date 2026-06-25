@@ -1,0 +1,9 @@
+services:
+  expensesplit:
+    build: .
+    container_name: expensesplit
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    env_file:
+      - .env

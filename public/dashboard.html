@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard - ExpenseSplit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="/css/main.css" />
+  <link rel="stylesheet" href="/css/components.css" />
+</head>
+
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+  <div id="toast-container" role="region" aria-label="Notifications" aria-live="polite"></div>
+
+  <!-- Add Expense Modal -->
+  <div class="modal-backdrop hidden" id="expenseModalBackdrop" role="dialog" aria-modal="true"
+    aria-labelledby="expenseModalTitle">
+    <div class="modal modal-lg">
+      <div class="modal-header">
+        <div>
+          <h2 class="modal-title" id="expenseModalTitle">Add Expense</h2>
+          <p class="modal-subtitle" id="expenseModalSubtitle">Record spending without leaving the dashboard.</p>
+        </div>
+        <button class="modal-close" id="expenseModalClose" aria-label="Close modal">×</button>
+      </div>
+      <div class="modal-body">
+        <form id="expenseForm" novalidate>
+          <input type="hidden" id="expenseId" />
+          <div class="form-row">
+            <div class="form-group">
+              <label for="expTitle">Title <span class="required">*</span></label>
+              <input type="text" id="expTitle" maxlength="150" placeholder="e.g. Dinner, cab, groceries" required />
+            </div>
+            <div class="form-group">
+              <label for="expAmount">Amount (Rs.) <span class="required">*</span></label>
+              <input type="number" id="expAmount" min="0.01" step="0.01" placeholder="0.00" required />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="expCategory">Category <span class="required">*</span></label>
+              <select id="expCategory" required>
+                <option value="">Select category</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="expDate">Date <span class="required">*</span></label>
+              <input type="date" id="expDate" required />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="expPayment">Payment method</label>
+              <select id="expPayment">
+                <option value="">Not specified</option>
+                <option value="cash">Cash</option>
+                <option value="card">Card</option>
+                <option value="upi">UPI</option>
+                <option value="netbanking">Net Banking</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="expTags">Tags</label>
+              <input type="text" id="expTags" placeholder="comma separated" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="expDescription">Description</label>
+            <textarea id="expDescription" rows="3" maxlength="500" placeholder="Optional notes"></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="expenseCancelBtn">Cancel</button>
+        <button class="btn btn-primary" id="expenseSaveBtn">Save Expense</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar" aria-label="Main navigation">
+      <div class="sidebar-header">
+        <a class="brand" href="/" aria-label="ExpenseSplit home">
+          <div class="brand-icon" aria-hidden="true"></div>
+          <span class="brand-name">ExpenseSplit</span>
+        </a>
+      </div>
+
+      <nav class="sidebar-nav" aria-label="Primary">
+        <span class="nav-section-label">Workspace</span>
+        <a class="nav-item active" href="/dashboard.html" aria-current="page">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+          </svg>
+          Dashboard
+        </a>
+        <a class="nav-item" href="/expenses.html">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+            <path d="M14 2v6h6M16 13H8M16 17H8" />
+          </svg>
+          Expenses
+        </a>
+        <a class="nav-item" href="/groups.html">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+            <path d="M23 21v-2a4 4 0 00-3-3.87" />
+          </svg>
+          Groups
+        </a>
+        <!-- <a class="nav-item" href="/categories.html">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z" />
+          </svg>
+          Categories
+        </a> -->
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="sidebar-user" id="sidebarUser">
+          <div class="user-avatar" id="userAvatar">U</div>
+          <div class="user-info">
+            <div class="user-name" id="userName">Loading...</div>
+            <div class="user-role">Personal account</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <div class="page-wrapper">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="mobile-nav-btn" id="mobileNavBtn" aria-label="Toggle sidebar" aria-expanded="false">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 6h18M3 12h18M3 18h18" />
+            </svg>
+          </button>
+          <nav class="topbar-breadcrumb">
+            <span>Workspace</span><span>/</span><strong>Dashboard</strong>
+          </nav>
+        </div>
+        <div class="topbar-right">
+          <button class="btn btn-sm btn-primary" id="topAddExpenseBtn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+            Add Expense
+          </button>
+          <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+            <svg id="themeIconSun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2">
+              <circle cx="12" cy="12" r="5" />
+              <path d="M12 1v2M12 21v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2" />
+            </svg>
+            <svg id="themeIconMoon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" style="display:none">
+              <path d="M21 12.8A9 9 0 1111.2 3 7 7 0 0021 12.8z" />
+            </svg>
+          </button>
+          <button class="btn btn-sm btn-secondary" id="logoutBtn">Sign out</button>
+        </div>
+      </header>
+
+      <main class="page-content" id="main-content">
+        <header class="page-header">
+          <div>
+            <p class="page-eyebrow">Personal finance command center</p>
+            <h1 class="page-title" id="greetingTitle">Good morning, <span id="userFirstName"></span></h1>
+            <p class="page-subtitle">Review spending by period, spot category patterns, and jump into expenses without
+              leaving this page.</p>
+          </div>
+          <div class="header-actions">
+            <button class="btn btn-primary" id="heroAddExpenseBtn">Add Expense</button>
+            <a href="/groups.html" class="btn btn-secondary">Manage Groups</a>
+          </div>
+        </header>
+
+        <div class="filters-bar">
+          <div class="filter-group">
+            <span class="filter-label">Range</span>
+            <select id="rangePreset">
+              <option value="this_month">This month</option>
+              <option value="this_week">This week</option>
+              <option value="last_month">Last month</option>
+              <option value="last_90_days">Last 90 days</option>
+              <option value="custom">Custom</option>
+            </select>
+          </div>
+          <div id="customRangeControls" class="custom-range hidden">
+            <input type="date" id="dateFrom" />
+            <span>to</span>
+            <input type="date" id="dateTo" />
+            <button class="btn btn-sm btn-secondary" id="applyRangeBtn">Apply</button>
+          </div>
+          <p id="rangeSummary" class="range-info"></p>
+        </div>
+
+        <div id="dashboardLoading" class="loading-state">
+          <div class="spinner spinner-lg"></div>
+          <span>Loading your dashboard...</span>
+        </div>
+
+        <div id="dashboardError" class="error-state hidden">
+          <span id="dashboardErrorMsg"></span>
+        </div>
+
+        <div id="dashboardContent" class="hidden">
+          <div class="stats-grid" id="statsGrid"></div>
+
+          <section class="dashboard-insights-grid">
+            <div class="card dashboard-mini-card">
+              <div class="dashboard-mini-label">Budget progress</div>
+              <div class="dashboard-mini-value" id="budgetValue">Not set</div>
+              <p class="dashboard-mini-copy">Budget tracking coming soon</p>
+            </div>
+            <div class="card dashboard-mini-card">
+              <div class="dashboard-mini-label">Income vs Expense</div>
+              <div class="dashboard-mini-value" id="incomeValue">No income tracked</div>
+              <p class="dashboard-mini-copy">Income tracking coming soon</p>
+            </div>
+            <div class="card dashboard-mini-card">
+              <div class="dashboard-mini-label">Group Balance</div>
+              <div class="dashboard-mini-value" id="groupBalanceValue">No groups yet</div>
+              <p class="dashboard-mini-copy">Shared balances coming soon</p>
+            </div>
+          </section>
+
+          <div class="dashboard-grid dashboard-grid-wide">
+            <div class="card">
+              <div class="card-header">
+                <h2 class="section-title">Spending Trend</h2>
+              </div>
+              <div class="card-body">
+                <div class="trend-chart" id="spendingTrend"></div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <h2 class="section-title">Top Categories</h2>
+                <a href="/categories.html" class="btn btn-sm btn-secondary">View all</a>
+              </div>
+              <div class="card-body">
+                <div class="data-list" id="topCategories"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h2 class="section-title">Recent Expenses</h2>
+              <a href="/expenses.html" class="btn btn-sm btn-secondary">View all</a>
+            </div>
+            <div class="card-body">
+              <div class="expense-list" id="recentExpenses"></div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="/js/auth.js"></script>
+  <script src="/js/services/dashboardService.js"></script>
+  <script src="/js/services/categoryService.js"></script>
+  <script src="/js/services/expenseService.js"></script>
+  <script src="/js/pages/dashboard.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Categories — ExpenseSplit</title>
+  <link rel="stylesheet" href="/css/main.css" />
+  <link rel="stylesheet" href="/css/components.css" />
+  <link rel="stylesheet" href="/css/categories.css" />
+</head>
+
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+  <div id="toast-container" role="region" aria-label="Notifications" aria-live="polite"></div>
+
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar" aria-label="Main navigation">
+      <div class="sidebar-header">
+        <a class="brand" href="/" aria-label="ExpenseSplit home">
+          <div class="brand-icon" aria-hidden="true"></div>
+          <span class="brand-name">ExpenseSplit</span>
+        </a>
+      </div>
+      <nav class="sidebar-nav" aria-label="Primary">
+        <span class="nav-section-label">Workspace</span>
+        <a class="nav-item" href="/dashboard.html">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+          </svg>
+          Dashboard
+        </a>
+        <a class="nav-item" href="/expenses.html">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+            <path d="M14 2v6h6M16 13H8M16 17H8" />
+          </svg>
+          Expenses
+        </a>
+        <a class="nav-item" href="/groups.html">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+            <path d="M23 21v-2a4 4 0 00-3-3.87" />
+          </svg>
+          Groups
+        </a>
+        <a class="nav-item active" href="/categories.html" aria-current="page">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z" />
+          </svg>
+          Categories
+        </a>
+
+        <span class="nav-section-label" style="margin-top: var(--space-3)">Account</span>
+        <a class="nav-item" href="/profile.html">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+            <circle cx="12" cy="7" r="4" />
+          </svg>
+          Profile
+        </a>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="sidebar-user" id="sidebarUser">
+          <div class="user-avatar" id="userAvatar">U</div>
+          <div class="user-info">
+            <div class="user-name" id="userName">Loading...</div>
+            <div class="user-role">Personal account</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <div class="page-wrapper">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="mobile-nav-btn" id="mobileNavBtn" aria-label="Toggle sidebar" aria-expanded="false">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 6h18M3 12h18M3 18h18" />
+            </svg>
+          </button>
+          <nav class="topbar-breadcrumb" aria-label="Breadcrumb">
+            <span>Workspace</span><span>/</span><strong>Categories</strong>
+          </nav>
+        </div>
+        <div class="topbar-right">
+          <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+            <svg id="themeIconSun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2">
+              <circle cx="12" cy="12" r="5" />
+              <path d="M12 1v2M12 21v2M1 12h2M21 12h2" />
+            </svg>
+            <svg id="themeIconMoon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" style="display:none">
+              <path d="M21 12.8A9 9 0 1111.2 3 7 7 0 0021 12.8z" />
+            </svg>
+          </button>
+          <button class="btn btn-sm btn-secondary" id="logoutBtn">Sign out</button>
+        </div>
+      </header>
+
+      <main class="page-content" id="main-content" tabindex="-1">
+        <header class="page-header">
+          <div>
+            <p class="page-eyebrow">Spending taxonomy</p>
+            <h1 class="page-title">Categories</h1>
+            <p class="page-subtitle">Shape your reports with custom categories for meals, travel, bills, events, and
+              household expenses.</p>
+          </div>
+          <button class="btn btn-primary" id="newCategoryBtn">New Category</button>
+        </header>
+
+        <!-- Loading / Error states -->
+        <div id="categoriesLoading" class="loading-state">
+          <div class="spinner spinner-lg"></div>
+          <span>Loading categories...</span>
+        </div>
+        <div id="categoriesError" class="error-state hidden" role="alert"></div>
+
+        <div id="categoriesContent" class="hidden">
+          <div class="category-grid" id="categoryGrid"></div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="/js/auth.js"></script>
+  <script src="/js/services/categoryService.js"></script>
+  <script src="/js/components/categoryModal.js"></script>
+  <script>
+    function loadCategories() {
+      const loading = document.getElementById('categoriesLoading');
+      const errorEl = document.getElementById('categoriesError');
+      const content = document.getElementById('categoriesContent');
+      const grid = document.getElementById('categoryGrid');
+
+      loading.classList.remove('hidden');
+      errorEl.classList.add('hidden');
+      content.classList.add('hidden');
+
+      categoryService.getAll()
+        .then(function (res) {
+          loading.classList.add('hidden');
+          content.classList.remove('hidden');
+
+          var cats = res.data.categories || [];
+          if (!cats.length) {
+            grid.innerHTML = '<div class="empty-state">No categories yet. Create your first category to get started.</div>';
+            return;
+          }
+          grid.innerHTML = cats.map(function (c) {
+            var defaultBadge = c.isDefault
+              ? '<span class="default-badge">Default</span>'
+              : '';
+            var deleteBtn = !c.isDefault
+              ? `<button class="btn btn-danger btn-sm" onclick="deleteCategory('${c._id}')">Delete</button>`
+              : '';
+            return `<div class="category-card">`
+              + `<div class="category-card-header">`
+              + `<div class="category-color-swatch" style="background:${c.color}"></div>`
+              + `<div><div class="category-name">${c.name}</div>${defaultBadge}</div>`
+              + `</div>`
+              + `<div class="category-actions">`
+              + `<button class="btn btn-secondary btn-sm" onclick='categoryModal.open(${JSON.stringify(c)})>Edit</button>`
+              + deleteBtn
+              + `</div>`
+              + `</div>`;
+          }).join('');
+        })
+        .catch(function (err) {
+          loading.classList.add('hidden');
+          errorEl.classList.remove('hidden');
+          errorEl.textContent = err.message || 'Failed to load categories';
+        });
+    }
+
+    function deleteCategory(id) {
+      if (!confirm('Delete this category?')) return;
+      categoryService.remove(id)
+        .then(function () {
+          loadCategories();
+        })
+        .catch(function (err) {
+          alert(err.message || 'Failed to delete category');
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', async function () {
+      const user = await auth.requireAuth();
+      if (!user) return;
+
+      // Initialize sidebar user info (same as profile)
+      if (typeof window.initializeSidebarUser === 'function') {
+        window.initializeSidebarUser();
+      } else {
+        // Fallback
+        const nameEl = document.getElementById('userName');
+        if (nameEl) nameEl.textContent = user.name || 'User';
+      }
+
+      loadCategories();
+
+      // New Category button
+      const newBtn = document.getElementById('newCategoryBtn');
+      if (newBtn) {
+        newBtn.addEventListener('click', () => {
+          if (typeof categoryModal !== 'undefined' && categoryModal.open) {
+            categoryModal.open();
+          }
+        });
+      }
+
+      // Theme toggle and mobile nav (reuse logic from other pages if available)
+    });
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,409 @@
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ── Two-column page layout ──────────────────────────────── */
+.profile-layout {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: var(--space-6);
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .profile-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Left: sticky avatar card ────────────────────────────── */
+.profile-sidebar-card {
+  position: sticky;
+  top: calc(var(--topbar-h) + var(--space-6));
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+/* ── Avatar cluster ──────────────────────────────────────── */
+.avatar-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  text-align: center;
+}
+
+.avatar-wrapper {
+  position: relative;
+  width: 96px;
+  height: 96px;
+  flex-shrink: 0;
+}
+
+.profile-avatar-img {
+  width: 96px;
+  height: 96px;
+  border-radius: var(--radius-full);
+  object-fit: cover;
+  display: block;
+}
+
+.profile-avatar-initials {
+  width: 96px;
+  height: 96px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--brand-600), var(--brand-800));
+  color: #fff;
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  user-select: none;
+}
+
+/* Camera-overlay on hover */
+.avatar-upload-overlay {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-full);
+  background: rgba(0, 0, 0, 0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: transparent;
+  transition:
+    background var(--duration) var(--ease),
+    color     var(--duration) var(--ease);
+}
+
+.avatar-upload-overlay svg {
+  opacity: 0;
+  transition: opacity var(--duration) var(--ease);
+  pointer-events: none;
+}
+
+.avatar-wrapper:hover .avatar-upload-overlay,
+.avatar-upload-overlay:focus-visible {
+  background: rgba(0, 0, 0, 0.48);
+  color: #fff;
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
+
+.avatar-wrapper:hover .avatar-upload-overlay svg,
+.avatar-upload-overlay:focus-visible svg {
+  opacity: 1;
+}
+
+/* Dim while uploading */
+.avatar-uploading .profile-avatar-initials,
+.avatar-uploading .profile-avatar-img {
+  opacity: 0.45;
+}
+
+.avatar-display-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+
+.avatar-display-email {
+  font-size: 12px;
+  color: var(--text-secondary);
+  word-break: break-all;
+}
+
+/* ── Sidebar stats ────────────────────────────────────────── */
+.profile-sidebar-stats {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--border);
+}
+
+.psstat {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.psstat-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.psstat-value {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* ── Right: stacked form sections ───────────────────────── */
+.profile-forms {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+/* ── Individual section card ─────────────────────────────── */
+.profile-section {
+  padding: var(--space-6);
+}
+
+.profile-section-header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  margin-bottom: var(--space-6);
+  padding-bottom: var(--space-5);
+  border-bottom: 1px solid var(--border);
+}
+
+/* Icon badge next to section title */
+.profile-section-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+.profile-section-icon--danger {
+  background: var(--danger-bg);
+  border-color: var(--danger-border);
+  color: var(--danger-text);
+}
+
+.profile-section-subtitle {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+/* ── Danger section ──────────────────────────────────────── */
+.profile-section--danger {
+  background: var(--danger-bg);
+  border-color: var(--danger-border);
+}
+
+/* Divider inside danger section must be visible on its bg */
+.profile-section--danger .profile-section-header {
+  border-bottom-color: var(--danger-border);
+}
+
+.danger-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.danger-row-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--danger-text);
+  margin-bottom: 2px;
+}
+
+.danger-row-desc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  max-width: 420px;
+  line-height: 1.5;
+}
+
+/* ── Danger banner (delete-account modal) ────────────────── */
+.danger-banner {
+  display: flex;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: var(--danger-bg);
+  border: 1px solid var(--danger-border);
+  border-radius: var(--radius);
+  color: var(--danger-text);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.danger-banner svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* ── Profile-specific form inputs ────────────────────────── */
+/*
+   Single authoritative block for all text/email/password
+   inputs inside profile sections.  No !important needed
+   because the specificity (3 classes + element) beats
+   any single-class rule from components.css.
+*/
+.profile-section .form-group {
+  margin-bottom: var(--space-5);
+}
+
+.profile-section .form-group:last-child {
+  margin-bottom: 0;
+}
+
+.profile-section .form-group label {
+  display: block;
+  margin-bottom: var(--space-2);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.profile-section .form-group input[type="text"],
+.profile-section .form-group input[type="email"],
+.profile-section .form-group input[type="password"],
+.profile-section .form-group input:not([type]) {
+  display: block;
+  width: 100%;
+  padding: 0 var(--space-4);
+  height: 44px;
+  line-height: 44px;
+  font-size: 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface-0);
+  color: var(--text-primary);
+  box-sizing: border-box;
+  transition:
+    border-color var(--duration-fast),
+    box-shadow   var(--duration-fast);
+}
+
+.profile-section .form-group input[type="text"]:hover,
+.profile-section .form-group input[type="email"]:hover,
+.profile-section .form-group input[type="password"]:hover,
+.profile-section .form-group input:not([type]):hover {
+  border-color: var(--border-strong);
+}
+
+.profile-section .form-group input[type="text"]:focus,
+.profile-section .form-group input[type="email"]:focus,
+.profile-section .form-group input[type="password"]:focus,
+.profile-section .form-group input:not([type]):focus {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.15);
+  outline: none;
+}
+
+/* Password inputs live inside .input-password-wrap;
+   they need right-padding for the toggle button.        */
+.input-password-wrap {
+  position: relative;
+}
+
+.input-password-wrap input {
+  padding-right: 44px; /* room for toggle button */
+}
+
+/* Eye toggle button */
+.pw-toggle {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-tertiary);
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  line-height: 0;
+  transition: color var(--duration-fast);
+}
+
+.pw-toggle:hover {
+  color: var(--text-secondary);
+}
+
+/* ── Password strength meter ─────────────────────────────── */
+.password-strength {
+  margin-top: var(--space-2);
+  font-size: 12px;
+}
+
+.strength-bar-row {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 5px;
+}
+
+.strength-bar {
+  height: 3px;
+  flex: 1;
+  border-radius: var(--radius-full);
+  background: var(--border);
+  transition: background var(--duration) var(--ease);
+}
+
+.strength-bar.filled-weak   { background: var(--danger); }
+.strength-bar.filled-fair   { background: var(--accent-500); }
+.strength-bar.filled-good   { background: var(--brand-400); }
+.strength-bar.filled-strong { background: var(--success-text); }
+
+.strength-label             { font-weight: 600; }
+.strength-label.weak        { color: var(--danger); }
+.strength-label.fair        { color: var(--accent-600); }
+.strength-label.good        { color: var(--brand-600); }
+.strength-label.strong      { color: var(--success-text); }
+
+/* ── Form action row (save button strip) ─────────────────── */
+.profile-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: var(--space-5);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--border);
+}
+
+/* ── Responsive ──────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .profile-section {
+    padding: var(--space-4);
+  }
+
+  .profile-section-header {
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-4);
+  }
+
+  .danger-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .profile-form-actions {
+    justify-content: stretch;
+  }
+
+  .profile-form-actions .btn {
+    width: 100%;
+  }
+}
