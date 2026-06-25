@@ -51,7 +51,7 @@ app.use(requestLogger);
 app.use(rateLimiter);
 
 // Static files - MUST be early
-app.use(express.static(path.join(__dirname, "public"), { index: false }));
+app.use(express.static(path.join(__dirname, "../frontend/public"), { index: false }));
 
 app.use('/uploads/avatars', express.static(path.join(__dirname, 'uploads/avatars')));
 app.use('/uploads/receipts', express.static(path.join(__dirname, 'uploads/receipts')));
@@ -73,7 +73,7 @@ const privatePages = [
 ];
 
 app.get(privatePages, pageAuth, (req, res) => {
-  res.sendFile(path.join(__dirname, "public", path.basename(req.path)));
+  res.sendFile(path.join(__dirname, "../frontend/public", path.basename(req.path)));
 });
 
 app.use("/api/v1", routes);

@@ -1,28 +1,19 @@
 {
-  "name": "expensesplit",
+  "name": "expensesplit-monorepo",
   "version": "1.0.0",
-  "description": "ExpenseSplit Foundation",
-  "main": "server.js",
+  "description": "ExpenseSplit - Full Stack Expense Management Application",
+  "private": true,
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js",
-    "lint": "eslint ."
+    "start": "cd backend && npm start",
+    "dev": "cd backend && npm run dev",
+    "lint": "npm run lint --workspace=backend && npm run lint --workspace=frontend",
+    "install-all": "npm install && cd backend && npm install && cd ../frontend && npm install"
   },
-  "dependencies": {
-    "bcryptjs": "^3.0.3",
-    "cors": "^2.8.5",
-    "dotenv": "^16.5.0",
-    "express": "^4.21.2",
-    "express-rate-limit": "^7.5.0",
-    "helmet": "^8.1.0",
-    "jsonwebtoken": "^9.0.3",
-    "mongoose": "^8.15.0",
-    "morgan": "^1.10.0",
-    "multer": "^2.2.0",
-    "winston": "^3.17.0"
-  },
-  "devDependencies": {
-    "eslint": "^9.30.1",
-    "nodemon": "^3.1.10"
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "engines": {
+    "node": ">=16.0.0"
   }
 }

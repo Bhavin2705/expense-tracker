@@ -1,0 +1,12 @@
+{
+  "name": "expensesplit-frontend",
+  "version": "1.0.0",
+  "description": "ExpenseSplit Frontend",
+  "private": true,
+  "scripts": {
+    "lint": "eslint ."
+  },
+  "devDependencies": {
+    "eslint": "^9.30.1"
+  }
+}
