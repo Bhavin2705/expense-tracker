@@ -14,8 +14,12 @@ const { sendSuccess } = require('../utils/response');
 const multer = require('multer');
 
 const AVATAR_DIR = path.join(__dirname, '../../uploads/avatars');
-// Ensure directory exists at startup
-if (!fs.existsSync(AVATAR_DIR)) fs.mkdirSync(AVATAR_DIR, { recursive: true });
+// Ensure directory exists at startup (wrapped for serverless compatibility)
+try {
+  if (!fs.existsSync(AVATAR_DIR)) fs.mkdirSync(AVATAR_DIR, { recursive: true });
+} catch (err) {
+  console.warn('Could not create avatar directory:', err.message);
+}
 
 const storage = multer.diskStorage({
     destination: function (_req, _file, cb) { cb(null, AVATAR_DIR); },

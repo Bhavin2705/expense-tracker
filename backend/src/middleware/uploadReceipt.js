@@ -4,8 +4,12 @@ const crypto = require('crypto');
 const fs = require('fs');
 
 const uploadDir = path.join(process.cwd(), 'uploads', 'receipts');
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
+try {
+  if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+  }
+} catch (err) {
+  console.warn('Could not create receipts directory:', err.message);
 }
 
 const storage = multer.diskStorage({

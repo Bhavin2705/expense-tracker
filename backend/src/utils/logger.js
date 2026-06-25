@@ -4,9 +4,13 @@ const winston = require("winston");
 
 const logDir = path.join(process.cwd(), "logs");
 
-fs.mkdirSync(logDir, {
-  recursive: true
-});
+try {
+  fs.mkdirSync(logDir, {
+    recursive: true
+  });
+} catch (err) {
+  console.warn('Could not create logs directory:', err.message);
+}
 
 const logger = winston.createLogger({
   level: "info",
