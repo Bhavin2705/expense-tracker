@@ -8,6 +8,11 @@ app.get("/api/v1/health", (req, res) => {
   res.json({ success: true, message: "API is running", version: "1.0.0" });
 });
 
+// Root redirect
+app.get("/", (req, res) => {
+  res.json({ message: "ExpenseSplit API. Visit /api/v1/health" });
+});
+
 // Load other modules safely
 try {
   const helmet = require("helmet");
@@ -61,6 +66,10 @@ try {
   app.use(errorHandler);
 } catch (error) {
   console.error("Error loading dependencies:", error.message);
+  // Still serve health endpoint
+  app.get("/api/v1/health", (req, res) => {
+    res.json({ success: true, message: "Basic API running", version: "1.0.0" });
+  });
 }
 
 // Export for Vercel serverless
