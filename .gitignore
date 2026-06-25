@@ -12,3 +12,6 @@ logs/*.log
 .sh
 .txt
 *.md
+
+.vercel
+.env*

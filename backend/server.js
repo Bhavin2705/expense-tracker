@@ -10,9 +10,6 @@ const logger = require("./src/utils/logger");
 if (!env.jwtSecret || env.jwtSecret === "change_me" || env.jwtSecret.length < 20) {
   logger.error("JWT_SECRET is missing or too weak. Please set a strong secret in .env");
   console.error("JWT_SECRET validation failed. Update .env and restart.");
-  if (process.env.NODE_ENV !== "production") {
-    process.exit(1);
-  }
 }
 
 const db = require("./src/config/db");
@@ -25,8 +22,28 @@ const pageAuth = require("./src/middleware/pageAuth");
 
 const app = express();
 
-// Connect to database
-db.connectDB(env.mongoUri);
+// Connect to database only once (lazy connection)
+let dbConnected = false;
+const connectDatabase = async () => {
+  if (!dbConnected) {
+    try {
+      await db.connectDB(env.mongoUri);
+      dbConnected = true;
+      logger.info("Database connected");
+    } catch (error) {
+      logger.error("Database connection failed:", error.message);
+      if (process.env.NODE_ENV !== "production") {
+        throw error;
+      }
+    }
+  }
+};
+
+// Middleware to ensure DB is connected
+app.use(async (req, res, next) => {
+  await connectDatabase();
+  next();
+});
 
 app.use(
   helmet({
@@ -72,7 +89,6 @@ const privatePages = [
   "/dashboard.html",
   "/expenses.html",
   "/groups.html",
-  // "/categories.html",
   "/profile.html"
 ];
 
@@ -91,7 +107,8 @@ module.exports = app;
 // For local development
 if (process.env.NODE_ENV !== "production") {
   const PORT = env.port || 5000;
-  const server = app.listen(PORT, () => {
+  const server = app.listen(PORT, async () => {
+    await connectDatabase();
     console.log(`ExpenseSplit running on http://localhost:${PORT}`);
   });
 
