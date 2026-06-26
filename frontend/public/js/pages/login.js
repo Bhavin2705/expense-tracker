@@ -20,14 +20,19 @@ window.loginPage = {
     const form = document.getElementById("loginForm");
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
-      const fd = new FormData(form);
-      const payload = { email: fd.get("email"), password: fd.get("password") };
-      const response = await authService.login(payload);
-      if (response.success) {
-        toast.show("Login successful", "success");
-        setTimeout(() => window.location.reload(), 400);
-      } else {
-        toast.show(response.message || "Login failed", "error");
+      try {
+        const fd = new FormData(form);
+        const payload = { email: fd.get("email"), password: fd.get("password") };
+        const response = await authService.login(payload);
+        if (response.success) {
+          toast.show("Login successful", "success");
+          setTimeout(() => window.location.reload(), 400);
+        } else {
+          toast.show(response.message || "Login failed", "error");
+        }
+      } catch (error) {
+        console.error("Login error:", error);
+        toast.show(error.message || error.data?.message || "Login failed", "error");
       }
     });
     document.getElementById("showRegister").addEventListener("click", () => app.showRegister());

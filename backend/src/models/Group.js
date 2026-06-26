@@ -76,6 +76,5 @@ groupSchema.pre("save", function (next) {
 
 groupSchema.index({ members: 1 });
 groupSchema.index({ createdBy: 1 });
-groupSchema.index({ inviteCode: 1 });
 
 module.exports = mongoose.models.Group || mongoose.model("Group", groupSchema);

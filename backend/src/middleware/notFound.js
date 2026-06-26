@@ -1,5 +1,7 @@
-const { error } = require("../utils/response");
-
-module.exports = (req, res) => {
-  return error(res, "Route not found", 404);
+const notFound = (req, res, next) => {
+  const error = new Error(`Not Found - ${req.originalUrl}`);
+  error.statusCode = 404;
+  next(error);                    // Pass error to errorHandler
 };
+
+module.exports = notFound;

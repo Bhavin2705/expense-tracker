@@ -21,14 +21,19 @@ window.registerPage = {
     const form = document.getElementById("registerForm");
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
-      const fd = new FormData(form);
-      const payload = { name: fd.get("name"), email: fd.get("email"), password: fd.get("password") };
-      const response = await authService.register(payload);
-      if (response.success) {
-        toast.show("Account created successfully", "success");
-        setTimeout(() => app.showLogin(), 800);
-      } else {
-        toast.show(response.message || "Registration failed", "error");
+      try {
+        const fd = new FormData(form);
+        const payload = { name: fd.get("name"), email: fd.get("email"), password: fd.get("password") };
+        const response = await authService.register(payload);
+        if (response.success) {
+          toast.show("Account created successfully", "success");
+          setTimeout(() => app.showLogin(), 800);
+        } else {
+          toast.show(response.message || "Registration failed", "error");
+        }
+      } catch (error) {
+        console.error("Registration error:", error);
+        toast.show(error.message || error.data?.message || "Registration failed", "error");
       }
     });
     document.getElementById("showLogin").addEventListener("click", () => app.showLogin());

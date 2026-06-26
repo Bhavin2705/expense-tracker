@@ -20,7 +20,17 @@ app.use(helmet({
 // CORS configuration
 app.use(cors({
   origin: env.clientUrl || "*",
-  credentials: true
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
+// Explicit preflight handler
+app.options('*', cors({
+  origin: env.clientUrl || "*",
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 // Middleware
@@ -74,13 +84,14 @@ const errorHandler = require("./src/middleware/errorHandler");
 app.use(notFound);
 app.use(errorHandler);
 
-// Export for Vercel serverless
-module.exports = app;
-
-// Local development only
-if (process.env.NODE_ENV !== "production" && require.main === module) {
+if (require.main === module) {
   const PORT = process.env.PORT || 5000;
+
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
+    console.log(`Health check: http://localhost:${PORT}/api/v1/health`);
   });
 }
+
+// For Vercel / serverless
+module.exports = app;
