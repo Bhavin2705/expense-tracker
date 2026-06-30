@@ -31,7 +31,6 @@ window.loginPage = {
           toast.show(response.message || "Login failed", "error");
         }
       } catch (error) {
-        console.error("Login error:", error);
         toast.show(error.message || error.data?.message || "Login failed", "error");
       }
     });

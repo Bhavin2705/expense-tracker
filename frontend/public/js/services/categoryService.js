@@ -1,114 +1,69 @@
-// =============================================
-// Category Service - Production Ready
-// =============================================
-
+// Category Service — uses Bearer token auth
 window.api = window.api || {};
+
+function getCatAuthHeaders() {
+  var headers = { 'Content-Type': 'application/json' };
+  var token = localStorage.getItem('accessToken');
+  if (token) headers['Authorization'] = 'Bearer ' + token;
+  return headers;
+}
 
 window.api.category = {
   getAll: async function () {
-    try {
-      const response = await fetch('/api/v1/categories', {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include'
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(
-          errorData.message ||
-          `Failed to load categories (status ${response.status})`
-        );
-      }
-
-      return await response.json();
-    } catch (err) {
-      console.error('Category getAll failed:', err);
-      throw err;
+    var response = await fetch('/api/v1/categories', {
+      method: 'GET',
+      headers: getCatAuthHeaders(),
+      credentials: 'include'
+    });
+    if (!response.ok) {
+      var errorData = await response.json().catch(function () { return {}; });
+      throw new Error(errorData.message || 'Failed to load categories');
     }
+    return response.json();
   },
 
   create: async function (payload) {
-    try {
-      const response = await fetch('/api/v1/categories', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-        credentials: 'include'
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(
-          errorData.message || 'Failed to create category'
-        );
-      }
-
-      return await response.json();
-    } catch (err) {
-      console.error('Category create failed:', err);
-      throw err;
+    var response = await fetch('/api/v1/categories', {
+      method: 'POST',
+      headers: getCatAuthHeaders(),
+      body: JSON.stringify(payload),
+      credentials: 'include'
+    });
+    if (!response.ok) {
+      var errorData = await response.json().catch(function () { return {}; });
+      throw new Error(errorData.message || 'Failed to create category');
     }
+    return response.json();
   },
 
   update: async function (id, payload) {
-    if (!id) {
-      throw new Error('Category ID is required');
+    if (!id) throw new Error('Category ID is required');
+    var response = await fetch('/api/v1/categories/' + id, {
+      method: 'PATCH',
+      headers: getCatAuthHeaders(),
+      body: JSON.stringify(payload),
+      credentials: 'include'
+    });
+    if (!response.ok) {
+      var errorData = await response.json().catch(function () { return {}; });
+      throw new Error(errorData.message || 'Failed to update category');
     }
-
-    try {
-      const response = await fetch(`/api/v1/categories/${id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-        credentials: 'include'
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(
-          errorData.message || 'Failed to update category'
-        );
-      }
-
-      return await response.json();
-    } catch (err) {
-      console.error('Category update failed:', err);
-      throw err;
-    }
+    return response.json();
   },
 
   remove: async function (id) {
-    if (!id) {
-      throw new Error('Category ID is required');
+    if (!id) throw new Error('Category ID is required');
+    var response = await fetch('/api/v1/categories/' + id, {
+      method: 'DELETE',
+      headers: getCatAuthHeaders(),
+      credentials: 'include'
+    });
+    if (!response.ok) {
+      var errorData = await response.json().catch(function () { return {}; });
+      throw new Error(errorData.message || 'Failed to delete category');
     }
-
-    try {
-      const response = await fetch(`/api/v1/categories/${id}`, {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include'
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(
-          errorData.message || 'Failed to delete category'
-        );
-      }
-
-      return await response.json();
-    } catch (err) {
-      console.error('Category delete failed:', err);
-      throw err;
-    }
+    return response.json();
   }
 };
 
-// Global exposure
 window.categoryService = window.api.category;
-
-console.log(
-  '%c✅ CategoryService loaded successfully',
-  'color: #10b981; font-weight: 500'
-);

@@ -2,8 +2,27 @@ var dashboardService = (function () {
   var BASE = '/api/v1/dashboard';
 
   function request(url) {
-    return fetch(url, { credentials: 'same-origin' })
+    var headers = { 'Accept': 'application/json' };
+    var token = localStorage.getItem('accessToken');
+    if (token) headers['Authorization'] = 'Bearer ' + token;
+
+    return fetch(url, { credentials: 'include', headers: headers })
       .then(function (res) {
+        if (res.status === 401) {
+          // Try refresh through the api object
+          if (window.api && window.api.refreshAccessToken) {
+            return window.api.refreshAccessToken().then(function (refreshed) {
+              if (refreshed) {
+                var retryHeaders = { 'Accept': 'application/json' };
+                var newToken = localStorage.getItem('accessToken');
+                if (newToken) retryHeaders['Authorization'] = 'Bearer ' + newToken;
+                return fetch(url, { credentials: 'include', headers: retryHeaders })
+                  .then(function (r) { return r.json(); });
+              }
+              throw new Error('Session expired');
+            });
+          }
+        }
         return res.json().then(function (data) {
           if (!res.ok) throw new Error(data.message || 'Request failed');
           return data;

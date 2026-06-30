@@ -377,7 +377,7 @@
   // ── Init ──────────────────────────────────────────────────
   document.addEventListener('DOMContentLoaded', async function () {
     if (typeof auth === 'undefined') {
-      console.error('auth.js must load before profile.js');
+      toast.show("Auth module not loaded", "error");
       return;
     }
 

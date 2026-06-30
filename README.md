@@ -1,163 +1,69 @@
 # ExpenseSplit
 
-ExpenseSplit is a full-stack personal finance and shared expense management platform designed for individuals, friend groups, roommates, travelers, and small teams.
-
-The application combines personal expense tracking, group expense management, and participant-based expense sharing into a single system. Users can track their own spending, organize expenses into categories, create groups, manage participants, and maintain a structured record of financial activity.
-
-A key design goal of ExpenseSplit is flexibility. Group participants do not need registered accounts. Users can create groups and add manual participants by name, making it suitable for real-world scenarios such as trips, events, shared households, office outings, and informal expense sharing.
-
-## Core Features
-
-### Personal Expense Management
-
-* Record daily expenses
-* Organize expenses with custom categories
-* Search and filter expenses
-* Track spending by date range
-* Upload and store expense receipts
-* Monitor personal spending history
-* View expense summaries and dashboard insights
-
-### Group Management
-
-* Create and manage expense groups
-* Add and remove group members
-* Archive inactive groups
-* Maintain participant records
-* Support multiple groups per user
-
-### Participant Management
-
-* Manual participants supported
-* Registered user linking
-* Participant activity tracking
-* Group-based participant organization
-* Flexible membership management
-
-### Dashboard & Insights
-
-* Expense summaries
-* Monthly spending overview
-* Category-based spending breakdowns
-* Recent activity tracking
-* Quick financial overview
-
-## Example Use Cases
-
-### Personal Budget Tracking
-
-Track everyday spending such as:
-
-* Food
-* Transport
-* Shopping
-* Bills
-* Entertainment
-* Health
-* Travel
-
-### Trip Expense Management
-
-Create a trip group and add participants:
-
-Goa Trip
-
-* Rahul
-* Aman
-* Priya
-* Neha
-
-Only one person needs an account. Others can be added as participants.
-
-### Shared Living Expenses
-
-Manage household spending for:
-
-* Rent
-* Utilities
-* Groceries
-* Internet
-* Maintenance
-
-### Event Planning
-
-Track expenses for:
-
-* Parties
-* Team outings
-* Weddings
-* Community events
-
-## Technology Stack
-
-### Frontend
-
-* HTML5
-* CSS3
-* Vanilla JavaScript
-
-### Backend
-
-* Node.js
-* Express.js
-
-### Database
-
-* MongoDB Atlas
-* Mongoose ODM
-
-### Infrastructure
-
-* Docker
-* Docker Compose
-
-### Security
-
-* JWT Authentication
-* Helmet
-* CORS
-* Rate Limiting
-* Request Logging
+ExpenseSplit is a comprehensive personal finance and shared expense management platform. It allows users to track their personal spending, organize trips, manage group expenses, and resolve debts seamlessly.
 
 ## Architecture
 
-ExpenseSplit follows a modular MVC architecture:
+This project operates as a monolithic deployment. The Express.js backend serves both the REST API (`/api/v1/*`) and the static frontend SPA files (HTML, CSS, Vanilla JS) from the same origin. 
 
-* Models handle database entities
-* Controllers manage business logic
-* Routes expose API endpoints
-* Middleware provides security and request processing
-* Services encapsulate reusable functionality
-* Utilities provide shared helpers
+## Features
+- **Personal Finance:** Track expenses, categorize spending, and visualize data via the dashboard.
+- **Group Splitting:** Create groups, add participants via invite codes, and track shared balances.
+- **Secure Authentication:** JWT-based access and refresh token rotation.
+- **Role-Based Access Control:** Admin and User tiers. Admin users have access to platform-wide statistics and user management.
+- **Media Uploads:** Upload profile avatars and expense receipts securely.
 
-This architecture supports long-term scalability and maintainability.
+## Prerequisites
+- Node.js (v18 or higher)
+- MongoDB (v5 or higher)
+- Docker (optional, for containerized deployments)
 
-## Current Development Status
+## Local Development Startup
 
-Implemented:
+1. **Install Dependencies**
+   Run the following command at the root to install both backend and frontend dependencies:
+   ```bash
+   npm run install-all
+   ```
 
-* Project foundation
-* MongoDB integration
-* Authentication system
-* User management
-* Group management
-* Participant management
-* Personal expense tracking
-* Category management
-* Dashboard APIs
-* Receipt uploads
+2. **Configure Environment variables**
+   Copy the `.env.example` file to `.env` inside the `backend` directory, and customize the variables.
+   ```bash
+   cp .env.example backend/.env
+   ```
 
-Planned:
+3. **Start the Application**
+   ```bash
+   npm start
+   ```
+   For development with hot-reloading:
+   ```bash
+   cd backend
+   npm run dev
+   ```
 
-* Group expense splitting
-* Settlement calculations
-* Cash ledger system
-* Friend management
-* Financial analytics
-* Reports and exports
-* Notifications
-* Production deployment enhancements
+4. **Access the App**
+   Navigate to [http://localhost:5000](http://localhost:5000)
 
-## Vision
+## Docker Deployment
 
-ExpenseSplit aims to provide a simple, reliable, and scalable platform for managing both personal and shared finances. The platform is designed to grow from a personal expense tracker into a complete financial collaboration system capable of handling everyday spending, group activities, settlements, and financial insights within a single application.
+To run the entire stack (Application + MongoDB) via Docker:
+
+```bash
+docker-compose up -d --build
+```
+The application will be available at `http://localhost:5000`. 
+Data uploaded (receipts/avatars) will be persisted in the `uploads-data` Docker volume.
+
+## Production Deployment Checklist
+- [ ] Set `NODE_ENV=production`
+- [ ] Generate strong, cryptographically secure keys for `JWT_SECRET` and `REFRESH_TOKEN_SECRET`.
+- [ ] Set `CLIENT_URL` to your production domain name (e.g., `https://my-app.com`).
+- [ ] Connect a secure, managed MongoDB cluster via `MONGODB_URI`.
+- [ ] If deploying behind a reverse proxy (like Nginx), ensure `X-Forwarded-For` headers are passed to Express for accurate rate-limiting.
+
+## Security Features
+- **NoSQL Injection Protection:** All request payloads (`req.body`, `req.query`, `req.params`) are sanitized globally to strip `$` keys.
+- **Rate Limiting:** `express-rate-limit` prevents brute force and DDoS attacks on the `/api` routes.
+- **Helmet:** Secure HTTP headers and Content Security Policies (CSP) are enforced.
+- **Ownership Validation:** The backend rigorously checks `userId` constraints on all Data CRUD operations.

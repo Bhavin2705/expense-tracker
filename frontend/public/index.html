@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ExpenseSplit</title>
+  <meta name="description" content="ExpenseSplit — Personal finance and shared expense management platform" />
+  <script>
+    // Check if user is authenticated, redirect accordingly
+    (function () {
+      var token = localStorage.getItem("accessToken");
+      if (token) {
+        window.location.replace("/dashboard.html");
+      } else {
+        window.location.replace("/login.html");
+      }
+    })();
+  </script>
+</head>
+<body>
+  <p>Redirecting...</p>
+</body>
+</html>

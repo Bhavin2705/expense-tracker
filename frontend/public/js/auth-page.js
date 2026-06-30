@@ -24,7 +24,7 @@
   async function request(endpoint, payload) {
     var response = await fetch("/api/v1/auth/" + endpoint, {
       method: "POST",
-      credentials: "same-origin",
+      credentials: "include",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
     });
@@ -44,7 +44,16 @@
     });
   });
 
-  fetch("/api/v1/auth/me", { credentials: "same-origin" })
+  // Check if already logged in
+  fetch("/api/v1/auth/me", {
+    credentials: "include",
+    headers: (function () {
+      var h = { "Accept": "application/json" };
+      var token = localStorage.getItem("accessToken");
+      if (token) h["Authorization"] = "Bearer " + token;
+      return h;
+    })()
+  })
     .then(function (response) {
       if (response.ok) window.location.replace("/dashboard.html");
     })
@@ -75,7 +84,25 @@
 
     setLoading(true);
     try {
-      await request(page, payload);
+      var result = await request(page, payload);
+
+      // Store tokens from response
+      if (result.data) {
+        if (result.data.accessToken) {
+          localStorage.setItem("accessToken", result.data.accessToken);
+        }
+        if (result.data.refreshToken) {
+          localStorage.setItem("refreshToken", result.data.refreshToken);
+        }
+        if (result.data.user) {
+          localStorage.setItem("currentUser", JSON.stringify(result.data.user));
+        }
+        // Also set on api object if available
+        if (window.api && window.api.setTokens) {
+          window.api.setTokens(result.data.accessToken, result.data.refreshToken);
+        }
+      }
+
       window.location.replace("/dashboard.html");
     } catch (error) {
       showError(error.message || "Authentication failed");

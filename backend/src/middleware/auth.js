@@ -10,9 +10,21 @@ module.exports = async (req, res, next) => {
       return res.status(401).json({ success: false, message: "Authentication required" });
     }
 
-    const decoded = jwt.verify(token, env.jwtSecret);
+    let decoded;
+    try {
+      decoded = jwt.verify(token, env.jwtSecret);
+    } catch (err) {
+      if (err.name === "TokenExpiredError") {
+        return res.status(401).json({
+          success: false,
+          message: "Token expired",
+          code: "TOKEN_EXPIRED"
+        });
+      }
+      return res.status(401).json({ success: false, message: "Invalid token" });
+    }
 
-    const user = await User.findById(decoded.userId).select("-password");
+    const user = await User.findById(decoded.userId).select("-password -refreshTokens");
     if (!user || !user.isActive) {
       return res.status(401).json({ success: false, message: "User not found or inactive" });
     }
@@ -20,6 +32,6 @@ module.exports = async (req, res, next) => {
     req.user = user;
     next();
   } catch (error) {
-    return res.status(401).json({ success: false, message: "Invalid or expired token" });
+    return res.status(401).json({ success: false, message: "Authentication failed" });
   }
 };

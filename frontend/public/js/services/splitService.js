@@ -1,104 +1,57 @@
-// =============================================
-// Split Expense Service - Production Ready
-// =============================================
+// Split Expense Service — uses Bearer token auth
+window.api = window.api || {};
 
-window.api || (window.api = {});
+function getSplitAuthHeaders(includeContentType) {
+    var headers = {};
+    if (includeContentType !== false) headers['Content-Type'] = 'application/json';
+    var token = localStorage.getItem('accessToken');
+    if (token) headers['Authorization'] = 'Bearer ' + token;
+    return headers;
+}
 
 window.api.split = {
-    getExpenses: async function (groupId, params = {}) {
+    getExpenses: async function (groupId, params) {
         if (!groupId) throw new Error('Group ID is required');
-
-        try {
-            const queryString = new URLSearchParams(params).toString();
-            const url = `/api/v1/groups/${groupId}/splits${queryString ? '?' + queryString : ''}`;
-
-            const response = await fetch(url, {
-                method: 'GET',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include'
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                throw new Error(errorData.message || 'Failed to load expenses');
-            }
-
-            return await response.json();
-        } catch (err) {
-            console.error('Split getExpenses failed:', err);
-            throw err;
+        params = params || {};
+        var queryString = new URLSearchParams(params).toString();
+        var url = '/api/v1/groups/' + groupId + '/splits' + (queryString ? '?' + queryString : '');
+        var response = await fetch(url, { method: 'GET', headers: getSplitAuthHeaders(), credentials: 'include' });
+        if (!response.ok) {
+            var errorData = await response.json().catch(function () { return {}; });
+            throw new Error(errorData.message || 'Failed to load expenses');
         }
+        return response.json();
     },
 
     createExpense: async function (groupId, payload) {
         if (!groupId) throw new Error('Group ID is required');
-
-        try {
-            const response = await fetch(`/api/v1/groups/${groupId}/splits`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload),
-                credentials: 'include'
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                throw new Error(errorData.message || 'Failed to create expense');
-            }
-
-            return await response.json();
-        } catch (err) {
-            console.error('Split createExpense failed:', err);
-            throw err;
+        var response = await fetch('/api/v1/groups/' + groupId + '/splits', { method: 'POST', headers: getSplitAuthHeaders(), body: JSON.stringify(payload), credentials: 'include' });
+        if (!response.ok) {
+            var errorData = await response.json().catch(function () { return {}; });
+            throw new Error(errorData.message || 'Failed to create expense');
         }
+        return response.json();
     },
 
     toggleSettled: async function (expenseId, participantId) {
         if (!expenseId || !participantId) throw new Error('Expense ID and Participant ID are required');
-
-        try {
-            const response = await fetch(`/api/v1/splits/${expenseId}/settle/${participantId}`, {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include'
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                throw new Error(errorData.message || 'Failed to update settlement');
-            }
-
-            return await response.json();
-        } catch (err) {
-            console.error('Split toggleSettled failed:', err);
-            throw err;
+        var response = await fetch('/api/v1/splits/' + expenseId + '/settle/' + participantId, { method: 'PATCH', headers: getSplitAuthHeaders(), credentials: 'include' });
+        if (!response.ok) {
+            var errorData = await response.json().catch(function () { return {}; });
+            throw new Error(errorData.message || 'Failed to update settlement');
         }
+        return response.json();
     },
 
     getBalances: async function (groupId) {
         if (!groupId) throw new Error('Group ID is required');
-
-        try {
-            const response = await fetch(`/api/v1/groups/${groupId}/splits/balances`, {
-                method: 'GET',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include'
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                throw new Error(errorData.message || 'Failed to load balances');
-            }
-
-            return await response.json();
-        } catch (err) {
-            console.error('Split getBalances failed:', err);
-            throw err;
+        var response = await fetch('/api/v1/groups/' + groupId + '/splits/balances', { method: 'GET', headers: getSplitAuthHeaders(), credentials: 'include' });
+        if (!response.ok) {
+            var errorData = await response.json().catch(function () { return {}; });
+            throw new Error(errorData.message || 'Failed to load balances');
         }
+        return response.json();
     }
 };
 
-// Global exposure
 window.splitService = window.api.split;
-
-console.log('%c✅ SplitService loaded successfully', 'color: #10b981; font-weight: 500');

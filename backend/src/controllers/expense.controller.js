@@ -23,11 +23,13 @@ function parseTags(tags) {
   return [];
 }
 
+const logger = require('../utils/logger');
+
 function deleteReceiptFile(receiptUrl) {
   if (!receiptUrl || !receiptUrl.startsWith('/uploads/receipts/')) return;
   const filePath = path.join(process.cwd(), receiptUrl.replace(/^\//, ''));
   fs.unlink(filePath, (err) => {
-    if (err && err.code !== 'ENOENT') console.error('Failed to delete receipt:', err);
+    if (err && err.code !== 'ENOENT') logger.error(`Failed to delete receipt: ${err.message}`);
   });
 }
 
@@ -73,7 +75,7 @@ const getExpenseSummary = async (req, res) => {
 
     res.json({ success: true, data: result });
   } catch (err) {
-    console.error(err);
+    logger.error(err.message);
     res.status(500).json({ success: false, message: 'Failed to fetch summary' });
   }
 };
@@ -129,7 +131,7 @@ const createExpense = async (req, res) => {
       data: { expense }
     });
   } catch (err) {
-    console.error(err);
+    logger.error(err.message);
     res.status(500).json({ success: false, message: err.message });
   }
 };
@@ -204,7 +206,7 @@ const getExpenses = async (req, res) => {
       }
     });
   } catch (err) {
-    console.error(err);
+    logger.error(err.message);
     res.status(500).json({ success: false, message: 'Failed to fetch expenses' });
   }
 };
@@ -269,7 +271,7 @@ const updateExpense = async (req, res) => {
 
     res.json({ success: true, data: { expense } });
   } catch (err) {
-    console.error(err);
+    logger.error(err.message);
     res.status(500).json({ success: false, message: err.message });
   }
 };

@@ -4,6 +4,7 @@
   "description": "ExpenseSplit Frontend",
   "private": true,
   "scripts": {
+    "build": "node build.js",
     "lint": "eslint ."
   },
   "devDependencies": {

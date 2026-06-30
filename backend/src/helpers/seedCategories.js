@@ -28,7 +28,8 @@ const seedDefaultCategories = async function (userId) {
     });
     await Category.insertMany(docs);
   } catch (err) {
-    console.error('seedDefaultCategories error:', err.message);
+    const logger = require("../utils/logger");
+    logger.error('seedDefaultCategories error: ' + err.message);
   }
 };
 

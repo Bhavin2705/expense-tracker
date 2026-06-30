@@ -5,17 +5,14 @@ const connectDB = async (uri) => {
   try {
     if (!uri || !uri.trim()) {
       logger.warn("MongoDB URI not configured. Running without database.");
-      console.warn("MongoDB URI not configured. Database connection skipped.");
       return;
     }
 
     await mongoose.connect(uri);
 
     logger.info("MongoDB connected");
-    console.log("MongoDB connected");
   } catch (error) {
     logger.error(error.message);
-    console.error(error.message);
   }
 };
 

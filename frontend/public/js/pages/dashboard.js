@@ -203,10 +203,9 @@
       renderCategories(data);
       renderTrend(data.spendingTrend || []);
       renderRecentExpenses(data.recentExpenses || []);
-
       content.classList.remove('hidden');
     } catch (err) {
-      console.error(err);
+      toast.show(err.message || "Failed to load dashboard", "error");
       document.getElementById('dashboardErrorMsg').textContent = err.message || 'Failed to load dashboard';
       errorEl.classList.remove('hidden');
     } finally {
@@ -330,10 +329,11 @@
     });
 
     // Navigation
-    document.getElementById('mobileNavBtn').addEventListener('click', () => {
+    const mobileNavBtn = document.getElementById('mobileNavBtn');
+    mobileNavBtn.addEventListener('click', function () {
       const sidebar = document.getElementById('sidebar');
       const isOpen = sidebar.classList.toggle('open');
-      this.setAttribute('aria-expanded', isOpen);
+      mobileNavBtn.setAttribute('aria-expanded', String(isOpen));
     });
 
     document.getElementById('logoutBtn').addEventListener('click', auth.logout);

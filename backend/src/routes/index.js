@@ -7,7 +7,8 @@ const profileRoutes = require("./profile.routes");
 const categoryRoutes = require("./category.routes");
 const expenseRoutes = require("./expense.routes");
 const dashboardRoutes = require("./dashboard.routes");
-const splitExpenseRoutes = require("./splitExpence.routes");
+const splitExpenseRoutes = require("./splitExpense.routes");
+const adminRoutes = require("./admin.routes");
 
 const router = express.Router();
 
@@ -22,8 +23,9 @@ router.use("/profile", profileRoutes);
 router.use("/categories", categoryRoutes);
 router.use("/expenses", expenseRoutes);
 router.use("/dashboard", dashboardRoutes);
+router.use("/admin", adminRoutes);
 
-// Split routes should be under /groups
-router.use("/groups", splitExpenseRoutes);   // ← Changed this line
+// Split routes under /groups
+router.use("/groups", splitExpenseRoutes);
 
-module.exports = router;    
+module.exports = router;

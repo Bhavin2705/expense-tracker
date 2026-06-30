@@ -888,7 +888,7 @@
   document.addEventListener("DOMContentLoaded", async function () {
     // FIX: guard against auth not being defined
     if (typeof auth === "undefined") {
-      console.error("auth.js must be loaded before groups.js");
+      toast.show("Auth module not loaded", "error");
       return;
     }
     var user = await auth.requireAuth();

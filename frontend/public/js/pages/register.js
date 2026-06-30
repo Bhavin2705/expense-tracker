@@ -32,7 +32,6 @@ window.registerPage = {
           toast.show(response.message || "Registration failed", "error");
         }
       } catch (error) {
-        console.error("Registration error:", error);
         toast.show(error.message || error.data?.message || "Registration failed", "error");
       }
     });

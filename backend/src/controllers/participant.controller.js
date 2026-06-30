@@ -77,6 +77,8 @@ exports.removeParticipant = async (req, res) => {
 
     return res.json({ success: true, message: "Participant removed successfully" });
   } catch (error) {
+    const logger = require("../utils/logger");
+    logger.error(error.message);
     return res.status(500).json({ success: false, message: error.message });
   }
 };

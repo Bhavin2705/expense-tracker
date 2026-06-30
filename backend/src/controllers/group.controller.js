@@ -49,7 +49,8 @@ exports.createGroup = async (req, res) => {
       data: populatedGroup
     });
   } catch (error) {
-    console.error("Create Group Error:", error);
+    const logger = require("../utils/logger");
+    logger.error("Create Group Error: " + error.message);
     return res.status(500).json({ success: false, message: error.message });
   }
 };
@@ -73,7 +74,8 @@ exports.getGroups = async (req, res) => {
 
     return res.json({ success: true, data: groups });
   } catch (error) {
-    console.error("Get Groups Error:", error);
+    const logger = require("../utils/logger");
+    logger.error("Get Groups Error: " + error.message);
     return res.status(500).json({ success: false, message: error.message });
   }
 };
@@ -98,7 +100,8 @@ exports.getGroup = async (req, res) => {
       data: { group, participants }
     });
   } catch (error) {
-    console.error("Get Group Error:", error);
+    const logger = require("../utils/logger");
+    logger.error("Get Group Error: " + error.message);
     return res.status(500).json({ success: false, message: error.message });
   }
 };
@@ -142,7 +145,8 @@ exports.updateGroup = async (req, res) => {
     await group.save();
     return res.json({ success: true, data: group });
   } catch (error) {
-    console.error("Update Group Error:", error);
+    const logger = require("../utils/logger");
+    logger.error("Update Group Error: " + error.message);
     return res.status(500).json({ success: false, message: error.message });
   }
 };
@@ -162,7 +166,8 @@ exports.archiveGroup = async (req, res) => {
 
     return res.json({ success: true, data: group });
   } catch (error) {
-    console.error("Archive Group Error:", error);
+    const logger = require("../utils/logger");
+    logger.error("Archive Group Error: " + error.message);
     return res.status(500).json({ success: false, message: error.message });
   }
 };
@@ -181,7 +186,8 @@ exports.deleteGroup = async (req, res) => {
 
     return res.json({ success: true, message: "Group deleted successfully" });
   } catch (error) {
-    console.error("Delete Group Error:", error);
+    const logger = require("../utils/logger");
+    logger.error("Delete Group Error: " + error.message);
     return res.status(500).json({ success: false, message: error.message });
   }
 };
@@ -239,7 +245,8 @@ exports.joinGroupByInvite = async (req, res) => {
 
     return res.json({ success: true, message: "Successfully joined the group" });
   } catch (error) {
-    console.error(error);
+    const logger = require("../utils/logger");
+    logger.error(error.message);
     return res.status(500).json({ success: false, message: error.message });
   }
 };
